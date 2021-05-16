@@ -15,6 +15,24 @@ There is the problem of how to find all matrices with a given determinant that g
 
 See in the description above, not all possible matrices for a given volume are tried out, missing out some smaller solutions. It was still fast enough in python to find solutions to all but 3 possible octocubes.
 
+
+### Fix
+
+I found the solution to the way to generate all useful matrices here: https://oeis.org/A001001
+
+> These sublattices are in 1-1 correspondence with matrices
+
+> `[a b d]`
+
+> `[0 c e]`
+
+> `[0 0 f]`
+
+> with `acf = n, b = 0..c-1, d = 0..f-1, e = 0..f-1`. The sublattice is primitive if `gcd(a,b,c,d,e,f) = 1`.
+
+So basically I came quite close with my assumption, missed to include `e` for some reason, and also I was thinking that I can reduce the `acf` product to be `volume * 1 * 1`. I will fix the code later accordingly.
+
+
 ### Usage Example
 `echo '[[0,0,0],[0,0,-1],[0,-1,-1],[0,-1,-2],[-1,-1,-2],[1,0,0],[1,0,1],[1,1,1]]' | python3 whuts.py`
 
