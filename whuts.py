@@ -238,6 +238,7 @@ def tile_space(block):
     num_blocks_in_pattern = 0
     while tiling is None:
         num_blocks_in_pattern += 1
+        print("N:", num_blocks_in_pattern)
         for offsets in next_grid(num_blocks_in_pattern * N):
             # print(offsets)
             tiling = tile_for_offsets(block, offsets)

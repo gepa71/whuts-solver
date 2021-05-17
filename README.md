@@ -9,7 +9,7 @@ If we start with 3 vectors in general position, it will be only possible to find
 
 Every time we have defined an offset matrix, we do a backtracking algorithm by placing some rotation/translation of the unfolding and checking if it fits, backtracking if not. There is some preprocessing for precomputing which cells are covered by each rotation/translation to optimize the backtracking search.
 
-There is the problem of how to find all matrices with a given determinant that generate distinct grids of points (e.g. in 2d the matrices ((1,1), (1,-1)) and ((1,1),(3,7)) will generate the same grid of points if repeated infinitely in all directions. I couldn't find a simple answer to this (I am sure there is one out there), so initially (not in this code) I tried some random matrices and keeping the ones with determinant `n*8` and checking if some generate the same grid to keep one of them. For this code I thought (not sure how I came up with that thought) that I could generate all possible distinct ways by using vectors (v, 0, 0), (a, 1, 0), (b, 0, 1) for a and b between 0 and v-1. I now realized that this is wrong (my older code found a solution for octocube_1325 with basic pattern volume 32, in contrast the smallest one that this code could find had volume 48).
+There is the problem of how to find all matrices with a given determinant that generate distinct grids of points (e.g. in 2d the matrices ((1,1), (1,-1)) and ((1,1),(3,7)) will generate the same grid of points if repeated infinitely in all directions. I couldn't find a simple answer to this (I am sure there is one out there), so initially (not in this code) I tried some random matrices and keeping the ones with determinant `n*8` and checking if some generate the same grid to keep one of them. For this code I thought (not sure how I came up with that thought) that I could generate all possible distinct ways by using vectors (v, 0, 0), (a, 1, 0), (b, 0, 1) for a and b between 0 and v-1. I now realized that this is wrong (my older code found a solution for octocube 1325 with basic pattern volume 32, in contrast the smallest one that this code could find had volume 48).
 
 ### Bugs
 
@@ -64,3 +64,14 @@ So Many | Had so many octocubes in the basic pattern
 0       | 5
 1       | 6
 1       | Unknown if it even has a tiling, but definitely > 6 if so
+
+After running the fixed code also with all hypercube unfoldings again, these are the stats:
+
+Out of the 261 hypercube unfoldings:
+
+So Many | Tile the space with so many unfoldings in the basic pattern
+--------|------------------------------------------------------------
+145     | 1
+116     | 2
+
+So basically, 145 of them can tile the space just by repeating at some directions without any rotations (and for the rest we just need to build a pattern made out of just two rotated instances and continue in three directions)!
