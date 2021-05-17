@@ -47,31 +47,61 @@ def main():
     for b in data["base_blocks"]:
         if not is_same_block(b, data["original_block"]):
             print(f"Block does not match original: { b }")
+            sys.exit(1)
 
-    N = 50
-    box = [[[None] * N for i in range(N)] for j in range(N)]
     offsets = data["offsets"]
-    for i in range(-N, N):
-        for j in range(-N, N):
-            for k in range(-N, N):
-                for b in data["base_blocks"]:
-                    for x, y, z in b:
-                        x1 = x + i * offsets[0][0] + j * offsets[1][0] + k * offsets[2][0]
-                        y1 = y + i * offsets[0][1] + j * offsets[1][1] + k * offsets[2][1]
-                        z1 = z + i * offsets[0][2] + j * offsets[1][2] + k * offsets[2][2]
-                        if x1 < 0 or y1 < 0 or z1 < 0 or x1 >= N or y1 >= N or z1 >= N:
-                            continue
-                        if box[x1][y1][z1] is not None:
-                            print(f"Duplicate at [{x1},{y1},{z1}] for i={i}, j={j}, k={k}")
-                            sys.exit(1)
-                        box[x1][y1][z1] = True
-    for i in range(N // 2):
-        for j in range(N // 2):
-            for k in range(N // 2):
-                if box[i][j][k] is None:
-                    print(f"Empty at [{i},{j},{k}]")
-                    sys.exit(1)
 
+    determinant = offsets[0][0] * offsets[1][1] * offsets[2][2] \
+            + offsets[0][1] * offsets[1][2] * offsets[2][0] \
+            + offsets[0][2] * offsets[1][0] * offsets[2][1] \
+            - offsets[0][0] * offsets[1][2] * offsets[2][1] \
+            - offsets[0][1] * offsets[1][0] * offsets[2][2] \
+            - offsets[0][2] * offsets[1][1] * offsets[2][0]
+
+    base_volume = len(data["original_block"]) * len(data["base_blocks"])
+    if determinant != base_volume:
+        # this can not fit
+        print(f"determinant:{determinant}, expected:{base_volume}")
+        sys.exit(1)
+
+    # For each cell in base_blocks, calculate its coordinates in the base
+    # defined by offsets, these will be some integer / determinant.
+    # If we get only the numerator modulo determinant, these should all
+    # be unique triplets.
+
+    # inverse of transposed of offsets matrix, multiplied by determinant
+    inverse = [
+            [
+                offsets[1][1] * offsets[2][2] - offsets[1][2] * offsets[2][1],
+                offsets[1][2] * offsets[2][0] - offsets[1][0] * offsets[2][2],
+                offsets[1][0] * offsets[2][1] - offsets[1][1] * offsets[2][0]
+            ],
+            [
+                offsets[0][2] * offsets[2][1] - offsets[0][1] * offsets[2][2],
+                offsets[0][0] * offsets[2][2] - offsets[0][2] * offsets[2][0],
+                offsets[0][1] * offsets[2][0] - offsets[0][0] * offsets[2][1]
+
+            ],
+            [
+                offsets[0][1] * offsets[1][2] - offsets[0][2] * offsets[1][1],
+                offsets[0][2] * offsets[1][0] - offsets[0][0] * offsets[1][2],
+                offsets[0][0] * offsets[1][1] - offsets[0][1] * offsets[1][0]
+            ]
+        ]
+
+    occupied = {}
+    for b in data["base_blocks"]:
+        for x, y, z in b:
+            x1 = (inverse[0][0] * x + inverse[0][1] * y + inverse[0][2] * z) % determinant
+            y1 = (inverse[1][0] * x + inverse[1][1] * y + inverse[1][2] * z) % determinant
+            z1 = (inverse[2][0] * x + inverse[2][1] * y + inverse[2][2] * z) % determinant
+            if (x1, y1, z1) in occupied:
+                print(f"Collision between ({x}, {y}, {z}) and ({occupied[(x1, y1, z1)]})")
+                sys.exit(1)
+            occupied[(x1, y1, z1)] = (x, y, z)
+
+    print("OK")
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
