@@ -20,7 +20,8 @@ def next_grid(volume):
     def next_diagonal(n):
         if n == 2:
             diagonal[n] = volume // diagonal[0] // diagonal[1]
-            yield diagonal
+            # we need to make a copy here!
+            yield list(diagonal)
             return
         if n == 0:
             v = volume
@@ -38,7 +39,9 @@ def next_grid(volume):
                 yield from next_diagonal(n+1)
             i += 1
 
-    for diag in next_diagonal(0):
+    diagonals = list(next_diagonal(0))
+    diagonals = sorted(diagonals, key=max)
+    for diag in diagonals:
         for b in range(diag[1]):
             for d in range(diag[2]):
                 for e in range(diag[2]):
@@ -139,6 +142,12 @@ def tile_for_offsets(block, offsets):
     # will all contain the key (2, 5, 13, 24) each.
     # possibilities[2][(2, 5, 13, 24)] will be some data structure helping later
     # for generating the actual result data.
+    #
+    # UPDATE:
+    # Because of the way the dfs is run, we don't need to store the set at all
+    # positions, but only in the smallest position. In the above example, when
+    # we are trying to fill cell 5, there is no need to check set (2, 5, 13, 24),
+    # because we know cell 2 is already covered!
 
     possibilities = [{} for i in range(volume)]
 
@@ -162,8 +171,8 @@ def tile_for_offsets(block, offsets):
                 bitmap = get_cover(b, x, y, z, i, offsets)
                 if len(bitmap) != len(block):
                     continue
-                for s in bitmap:
-                    possibilities[s][bitmap] = (b, x, y, z, i)
+                s = min(bitmap)
+                possibilities[s][bitmap] = (b, x, y, z, i)
 
     covered = set()
     solution = [None] * volume
@@ -238,8 +247,8 @@ def tile_space(block):
     num_blocks_in_pattern = 0
     while tiling is None:
         num_blocks_in_pattern += 1
+        # print("N:", num_blocks_in_pattern)
         for offsets in next_grid(num_blocks_in_pattern * N):
-            # print(offsets)
             tiling = tile_for_offsets(block, offsets)
             if tiling is not None:
                 break

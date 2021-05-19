@@ -1,5 +1,6 @@
 import itertools
 import json
+import sys
 
 def rotate_x(block):
     return tuple([(x, -z, y) for x, y, z in block])
@@ -50,9 +51,9 @@ def generate(n):
 
     items[1] = set([((0,0,0),)])
 
-    for n in range(2, 9):
-        items[n] = set()
-        for a in items[n-1]:
+    for k in range(2, n + 1):
+        items[k] = set()
+        for a in items[k-1]:
             for x, y, z in a:
                 for dx, dy, dz in ([-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1]):
                     p = (x + dx, y + dy, z + dz)
@@ -60,9 +61,12 @@ def generate(n):
                         continue
                     q = tuple(list(a) + [p])
                     q = norm(q)
-                    items[n].add(q)
+                    items[k].add(q)
     return sorted(items[n])
 
 
 if __name__ == "__main__":
-    print(json.dumps(generate(8), indent=4))
+    if len(sys.argv) != 2:
+        sys.stderr.write(f"Usage: {sys.argv[0]} <N>\n")
+        sys.exit(1)
+    print(json.dumps(generate(int(sys.argv[1])), indent=4))
