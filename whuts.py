@@ -247,8 +247,12 @@ def tile_space(block):
     num_blocks_in_pattern = 0
     while tiling is None:
         num_blocks_in_pattern += 1
-        # print("N:", num_blocks_in_pattern)
+        # sys.stderr.write(f"N:{num_blocks_in_pattern}\n")
+        k = 0
         for offsets in next_grid(num_blocks_in_pattern * N):
+            k += 1
+            # if k % 1000 == 0:
+            #    sys.stderr.write(f"k:{k}\n")
             tiling = tile_for_offsets(block, offsets)
             if tiling is not None:
                 break

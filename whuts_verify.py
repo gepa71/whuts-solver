@@ -59,7 +59,7 @@ def main():
             - offsets[0][2] * offsets[1][1] * offsets[2][0]
 
     base_volume = len(data["original_block"]) * len(data["base_blocks"])
-    if determinant != base_volume:
+    if abs(determinant) != base_volume:
         # this can not fit
         print(f"determinant:{determinant}, expected:{base_volume}")
         sys.exit(1)
