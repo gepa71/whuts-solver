@@ -3,7 +3,7 @@ Code to find solutions for tiling the space by any of the 3d unfoldings of a 4d 
 
 ### Update
 
-After some discussion with Matt Whitney based on his question on stackexchange: https://math.stackexchange.com/questions/4142544/smallest-non-space-filling-polycube I have now generalized the code to generate tilings for poly-hypercubes in higher dimensions. I did some optimizations in the code and rewrote in C (called it poly_tiling_multidim and have both a C and a Python version in src), in C I am using now Knuth's Algorithm X which is more efficient, but also a lot of low level optimizations make the C code much more efficient than the Python code (in which I avoided making these optimizations and tried to keep the code clean).
+After some discussion with Glen Whitney based on his question on stackexchange: https://math.stackexchange.com/questions/4142544/smallest-non-space-filling-polycube I have now generalized the code to generate tilings for poly-hypercubes in higher dimensions. I did some optimizations in the code and rewrote in C (called it poly_tiling_multidim and have both a C and a Python version in src), in C I am using now Knuth's Algorithm X which is more efficient, but also a lot of low level optimizations make the C code much more efficient than the Python code (in which I avoided making these optimizations and tried to keep the code clean).
 
 After running this on polytesseracts, it could find tilings for all up to and including all nonotesseracts (to be exact I run it only up to 4 polytesseracts in the main pattern, and so far it could not find anything for 2 nonotesseracts, but after checking these manually, these are flat and they have already a solution in 3d requiring 6 polycubes, so this can be obviously extended to 4d).
 
