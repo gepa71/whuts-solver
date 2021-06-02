@@ -43,8 +43,6 @@ static int next_left[MAX_ITEMS][MAX_VOLUME + 1];
 static int next_right[MAX_ITEMS][MAX_VOLUME + 1];
 static int next_count[MAX_VOLUME + 1];
 
-static int del_rows[MAX_ROTATIONS * MAX_POLY_SIZE * MAX_POLY_SIZE * MAX_POLY_SIZE];
-
 static int solution[MAX_VOLUME];
 
 void calculate_rotations(int n, int parity) {
@@ -374,6 +372,7 @@ int solve(int n) {
     }
     for (int row = next_down[0][cmin]; row != 0; row = next_down[row][cmin]) {
         solution[n] = row - 1;
+        int del_rows[MAX_ROTATIONS * MAX_POLY_SIZE * MAX_POLY_SIZE];
         int num_del_rows = 0;
         for (int col = next_right[row][0]; col != 0; col = next_right[row][col]) {
             for (int drow = next_down[row][col]; drow != row; drow = next_down[drow][col]) {
@@ -396,13 +395,13 @@ int solve(int n) {
         for (int col = next_right[row][0]; col != 0; col = next_right[row][col]) {
             // bring back col
             recover_left_right(0, col);
-            for (int i = num_del_rows - 1; i >= 0; i--) {
-                int drow = del_rows[i];
-                // bring back drow
-                for (int dcol = next_right[drow][0]; dcol != 0; dcol = next_right[drow][dcol]) {
-                    recover_up_down(drow, dcol);
-                    next_count[dcol]++;
-                }
+        }
+        for (int i = num_del_rows - 1; i >= 0; i--) {
+            int drow = del_rows[i];
+            // bring back drow
+            for (int dcol = next_right[drow][0]; dcol != 0; dcol = next_right[drow][dcol]) {
+                recover_up_down(drow, dcol);
+                next_count[dcol]++;
             }
         }
         if (n == 0) {

@@ -30,6 +30,7 @@ def rotate(rot, block):
 
 
 def init_rotations(dim):
+    ROTATIONS.clear()
     def next_rotation(rot, used, n, parity):
         if n == len(rot):
             yield rot, parity % 2
@@ -105,14 +106,15 @@ def multiply(matrix, vector):
     return tuple(product)
 
 
-def main():
-    data = json.loads(sys.stdin.read())
+def check_result(data):
     dim = len(data["original_block"][0])
-    init_rotations(dim)
+    if not ROTATIONS or len(ROTATIONS[0]) != dim:
+        print(f"dim:{dim}")
+        init_rotations(dim)
     for b in data["base_blocks"]:
         if not is_same_block(b, data["original_block"]):
             print(f"Block does not match original: { b }")
-            sys.exit(1)
+            return False
 
     offsets = data["offsets"]
 
@@ -121,7 +123,7 @@ def main():
     if abs(determinant) != base_volume:
         # this can not fit
         print(f"determinant:{determinant}, expected:{base_volume}")
-        sys.exit(1)
+        return False
 
     # For each cell in base_blocks, calculate its coordinates in the base
     # defined by offsets, these will be some integer / determinant.
@@ -150,8 +152,25 @@ def main():
                 sys.exit(1)
             occupied[cube1] = cube
 
-    print("OK")
-    sys.exit(0)
+    return True
+
+
+def main():
+    data = json.loads(sys.stdin.read())
+    dim = 0
+    if type(data) != list:
+        data = [data]
+    processed = 0
+    failed = 0
+    for i, result in enumerate(data):
+        processed += 1
+        if not check_result(result):
+            failed += 1
+            print(f"Failed for index:{i}, original_block:{data['original_block']}")
+        if processed % 10000 == 0:
+            print(f"Processed: {processed} Failed:{failed}")
+    print(f"Processed: {processed} Failed:{failed}")
+
 
 if __name__ == "__main__":
     main()
